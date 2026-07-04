@@ -1,4 +1,4 @@
-const boards = [
+const builtInBoards = [
   {
     name: "Starter",
     sounds: [
@@ -61,14 +61,25 @@ const boards = [
   },
 ];
 
+const boards = [
+  ...builtInBoards,
+  ...normalizeAudioBoards(window.audioBoards || []),
+];
+
 const board = document.querySelector("#soundboard");
 const stopAllButton = document.querySelector("#stopAll");
 const boardSwitch = document.querySelector("#boardSwitch");
 const boardName = document.querySelector("#boardName");
+const boardModal = document.querySelector("#boardModal");
+const boardList = document.querySelector("#boardList");
+const closeBoardModalButton = document.querySelector("#closeBoardModal");
 const activeSources = new Set();
 const activeAudioElements = new Set();
 let audioContext;
 let currentBoardIndex = 0;
+let boardDragStartX = 0;
+let boardDragPointerId = null;
+let lastFocusedElement;
 
 const padColors = [
   "#f4c64d",
@@ -273,7 +284,7 @@ function renderBoard(boardConfig) {
   board.setAttribute("aria-label", `${boardConfig.name} soundboard pads`);
 
   boardConfig.sounds.forEach((sound, index) => {
-    const padColor = padColors[index] || sound.color || "#8bd3ff";
+    const padColor = sound.color || padColors[index % padColors.length] || "#8bd3ff";
     const pad = document.createElement("button");
     pad.type = "button";
     pad.className = "pad";
@@ -288,12 +299,46 @@ function renderBoard(boardConfig) {
   });
 }
 
+function normalizeAudioBoards(audioBoardConfigs) {
+  return audioBoardConfigs.map((audioBoardConfig) => {
+    const folder = audioBoardConfig.folder.replace(/\/$/, "");
+
+    return {
+      name: audioBoardConfig.name,
+      sounds: audioBoardConfig.sounds.map((soundConfig) => {
+        if (typeof soundConfig === "string") {
+          return {
+            name: getSoundName(soundConfig),
+            src: `${folder}/${soundConfig}`,
+          };
+        }
+
+        const fileName = soundConfig.file || soundConfig.src;
+
+        return {
+          ...soundConfig,
+          name: soundConfig.name || getSoundName(fileName),
+          src: soundConfig.src || `${folder}/${fileName}`,
+        };
+      }),
+    };
+  });
+}
+
+function getSoundName(fileName) {
+  return fileName
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 function switchBoard(boardIndex) {
   currentBoardIndex = boardIndex;
   const boardConfig = boards[currentBoardIndex];
 
   stopAllSounds();
   boardName.textContent = boardConfig.name;
+  updateBoardSwitch();
   renderBoard(boardConfig);
 }
 
@@ -324,17 +369,132 @@ function stopAllSounds() {
   });
 }
 
-boardSwitch.max = String(boards.length - 1);
-boardSwitch.value = String(currentBoardIndex);
+function updateBoardSwitch(previewIndex = currentBoardIndex) {
+  const maxBoardIndex = boards.length - 1;
+  const progress = maxBoardIndex === 0 ? 0 : (previewIndex / maxBoardIndex) * 100;
+  const boardConfig = boards[previewIndex];
 
-boardSwitch.addEventListener("input", () => {
-  const nextBoardIndex = Number(boardSwitch.value);
+  boardSwitch.style.setProperty("--board-switch-progress", `${progress}%`);
+  boardSwitch.setAttribute("aria-label", `Open board picker. Current board: ${boards[currentBoardIndex].name}`);
+  boardName.textContent = boardConfig.name;
+}
 
-  if (nextBoardIndex !== currentBoardIndex) {
-    switchBoard(nextBoardIndex);
+function renderBoardPicker() {
+  boardList.replaceChildren();
+
+  boards.forEach((boardConfig, index) => {
+    const boardOption = document.createElement("button");
+    boardOption.type = "button";
+    boardOption.className = "board-option";
+
+    if (index === currentBoardIndex) {
+      boardOption.classList.add("is-current");
+      boardOption.setAttribute("aria-current", "true");
+    }
+
+    boardOption.innerHTML = `
+      <span class="board-option-name">${boardConfig.name}</span>
+      <span class="board-option-count">${boardConfig.sounds.length} pads</span>
+    `;
+    boardOption.addEventListener("click", () => {
+      switchBoard(index);
+      closeBoardPicker();
+    });
+    boardList.append(boardOption);
+  });
+}
+
+function openBoardPicker() {
+  lastFocusedElement = document.activeElement;
+  renderBoardPicker();
+  boardModal.hidden = false;
+  boardSwitch.setAttribute("aria-expanded", "true");
+  document.body.classList.add("has-open-modal");
+  closeBoardModalButton.focus();
+}
+
+function closeBoardPicker() {
+  boardModal.hidden = true;
+  boardSwitch.setAttribute("aria-expanded", "false");
+  document.body.classList.remove("has-open-modal");
+  updateBoardSwitch();
+
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
+  }
+}
+
+boardSwitch.addEventListener("pointerdown", (event) => {
+  boardDragStartX = event.clientX;
+  boardDragPointerId = event.pointerId;
+  boardSwitch.classList.add("is-dragging");
+  boardSwitch.setPointerCapture(event.pointerId);
+});
+
+boardSwitch.addEventListener("pointermove", (event) => {
+  if (event.pointerId !== boardDragPointerId) {
+    return;
+  }
+
+  const dragDistance = Math.abs(event.clientX - boardDragStartX);
+
+  if (dragDistance < 18) {
+    return;
+  }
+
+  const switchBounds = boardSwitch.getBoundingClientRect();
+  const progress = Math.min(Math.max((event.clientX - switchBounds.left) / switchBounds.width, 0), 1) * 100;
+
+  boardSwitch.style.setProperty("--board-switch-progress", `${progress}%`);
+});
+
+boardSwitch.addEventListener("pointerup", (event) => {
+  if (event.pointerId !== boardDragPointerId) {
+    return;
+  }
+
+  const dragDistance = Math.abs(event.clientX - boardDragStartX);
+
+  boardSwitch.classList.remove("is-dragging");
+  boardDragPointerId = null;
+
+  if (dragDistance >= 36) {
+    openBoardPicker();
+  } else {
+    updateBoardSwitch();
+  }
+});
+
+boardSwitch.addEventListener("pointercancel", () => {
+  boardSwitch.classList.remove("is-dragging");
+  boardDragPointerId = null;
+  updateBoardSwitch();
+});
+
+boardSwitch.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") {
+    return;
+  }
+
+  event.preventDefault();
+  openBoardPicker();
+});
+
+closeBoardModalButton.addEventListener("click", closeBoardPicker);
+
+boardModal.addEventListener("click", (event) => {
+  if (event.target === boardModal) {
+    closeBoardPicker();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !boardModal.hidden) {
+    closeBoardPicker();
   }
 });
 
 stopAllButton.addEventListener("click", stopAllSounds);
 
+updateBoardSwitch();
 switchBoard(currentBoardIndex);

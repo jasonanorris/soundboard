@@ -28,14 +28,21 @@ body {
   color: var(--text);
 }
 
+body.has-open-modal {
+  overflow: hidden;
+}
+
 button {
   font: inherit;
 }
 
 .app-shell {
   width: min(100% - 32px, 980px);
+  min-height: 100vh;
   margin: 0 auto;
   padding: 36px 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .topbar {
@@ -86,17 +93,71 @@ p {
   text-align: right;
 }
 
-.board-switcher input {
+.board-slider {
+  --board-switch-progress: 0%;
+  position: relative;
   grid-column: 1 / -1;
   width: 100%;
-  height: 28px;
+  height: 32px;
   margin: 0;
-  accent-color: var(--accent);
+  padding: 0;
+  border: 1px solid rgba(244, 198, 77, 0.36);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent),
+    rgba(12, 14, 17, 0.86);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.42),
+    0 8px 18px rgba(0, 0, 0, 0.18);
   cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
 
-.board-switcher input:active {
+.board-slider:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent), white 25%);
+  outline-offset: 2px;
+}
+
+.board-slider-fill {
+  position: absolute;
+  inset: 4px;
+  right: calc(100% - var(--board-switch-progress));
+  min-width: 22px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.board-slider-thumb {
+  position: absolute;
+  top: 50%;
+  left: clamp(12px, var(--board-switch-progress), calc(100% - 12px));
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.84);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.18) 36%, transparent 37%),
+    linear-gradient(145deg, var(--accent), #f58fb0);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.38),
+    0 0 0 4px rgba(244, 198, 77, 0.12);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition:
+    left 140ms ease,
+    transform 140ms ease;
+}
+
+.board-slider.is-dragging {
   cursor: grabbing;
+}
+
+.board-slider.is-dragging .board-slider-thumb {
+  transform: translate(-50%, -50%) scale(1.08);
+  transition: transform 100ms ease;
 }
 
 .stop-button {
@@ -114,7 +175,114 @@ p {
   background: rgba(255, 107, 107, 0.2);
 }
 
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(5, 7, 9, 0.72);
+  backdrop-filter: blur(8px);
+  z-index: 20;
+}
+
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.board-modal {
+  width: min(100%, 420px);
+  max-height: min(640px, calc(100vh - 36px));
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border: 1px solid rgba(244, 198, 77, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(244, 198, 77, 0.08), transparent),
+    #171b20;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
+  overflow: hidden;
+}
+
+.board-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.board-modal h2 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.modal-close {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-strong);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.modal-close:hover,
+.modal-close:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.board-list {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  overflow: auto;
+}
+
+.board-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05), transparent),
+    var(--panel);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.board-option:hover,
+.board-option:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.board-option.is-current {
+  border-color: var(--accent);
+  background:
+    linear-gradient(145deg, rgba(244, 198, 77, 0.18), transparent),
+    var(--panel-strong);
+}
+
+.board-option-name {
+  font-weight: 800;
+}
+
+.board-option-count {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .board {
+  align-self: center;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
@@ -208,8 +376,13 @@ p {
     font-size: 0.62rem;
   }
 
-  .board-switcher input {
-    height: 24px;
+  .board-slider {
+    height: 28px;
+  }
+
+  .board-slider-thumb {
+    width: 22px;
+    height: 22px;
   }
 
   .stop-button {
@@ -260,5 +433,13 @@ p {
 
   .stop-button {
     width: auto;
+  }
+
+  .modal-backdrop {
+    padding: 8px;
+  }
+
+  .board-modal {
+    max-height: calc(100vh - 16px);
   }
 }

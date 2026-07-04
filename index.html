@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Soundboard</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="audio/boards.js"></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -15,24 +16,44 @@
           <p>25 quick pads with starter synth sounds.</p>
         </div>
         <div class="topbar-controls">
-          <label class="board-switcher" for="boardSwitch">
+          <div class="board-switcher">
             <span class="board-switcher-label">Board</span>
-            <input
-              type="range"
+            <button
+              class="board-slider"
+              type="button"
               id="boardSwitch"
-              min="0"
-              max="0"
-              value="0"
-              step="1"
-              aria-label="Switch soundboard"
+              aria-label="Open board picker"
+              aria-haspopup="dialog"
+              aria-controls="boardModal"
+              aria-expanded="false"
             >
+              <span class="board-slider-fill"></span>
+              <span class="board-slider-thumb"></span>
+            </button>
             <span class="board-switcher-name" id="boardName">Starter</span>
-          </label>
+          </div>
           <button class="stop-button" type="button" id="stopAll">Stop</button>
         </div>
       </header>
 
       <section class="board" id="soundboard" aria-label="Soundboard pads"></section>
     </main>
+
+    <div class="modal-backdrop" id="boardModal" hidden>
+      <section
+        class="board-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="boardModalTitle"
+      >
+        <header class="board-modal-header">
+          <h2 id="boardModalTitle">Choose Board</h2>
+          <button class="modal-close" type="button" id="closeBoardModal" aria-label="Close board picker">
+            Close
+          </button>
+        </header>
+        <div class="board-list" id="boardList"></div>
+      </section>
+    </div>
   </body>
 </html>
