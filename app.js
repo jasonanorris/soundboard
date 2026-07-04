@@ -1,36 +1,74 @@
-const soundConfig = [
-  { name: "Kick", type: "kick", color: "#f4c64d" },
-  { name: "Snare", type: "snare", color: "#ff6b6b" },
-  { name: "Hat", type: "hat", color: "#d8dee9" },
-  { name: "Clap", type: "clap", color: "#f58fb0" },
-  { name: "Tom", type: "tom", color: "#d08770" },
-  { name: "Bass A", type: "tone", frequency: 110, wave: "sawtooth", color: "#42d392" },
-  { name: "Bass C", type: "tone", frequency: 130.81, wave: "sawtooth", color: "#42d392" },
-  { name: "Bass E", type: "tone", frequency: 164.81, wave: "sawtooth", color: "#42d392" },
-  { name: "Bass G", type: "tone", frequency: 196, wave: "sawtooth", color: "#42d392" },
-  { name: "Bass B", type: "tone", frequency: 246.94, wave: "sawtooth", color: "#42d392" },
-  { name: "Bell A", type: "tone", frequency: 440, wave: "sine", color: "#8bd3ff" },
-  { name: "Bell C", type: "tone", frequency: 523.25, wave: "sine", color: "#8bd3ff" },
-  { name: "Bell E", type: "tone", frequency: 659.25, wave: "sine", color: "#8bd3ff" },
-  { name: "Bell G", type: "tone", frequency: 783.99, wave: "sine", color: "#8bd3ff" },
-  { name: "Bell B", type: "tone", frequency: 987.77, wave: "sine", color: "#8bd3ff" },
-  { name: "Zap", type: "zap", color: "#b48cff" },
-  { name: "Laser", type: "laser", color: "#b48cff" },
-  { name: "Rise", type: "rise", color: "#f38ba8" },
-  { name: "Drop", type: "drop", color: "#f38ba8" },
-  { name: "Blip", type: "tone", frequency: 880, wave: "square", color: "#f38ba8" },
-  { name: "Chord A", type: "chord", frequencies: [220, 277.18, 329.63], color: "#a6e3a1" },
-  { name: "Chord B", type: "chord", frequencies: [246.94, 311.13, 369.99], color: "#a6e3a1" },
-  { name: "Chord C", type: "chord", frequencies: [261.63, 329.63, 392], color: "#a6e3a1" },
-  { name: "Chord D", type: "chord", frequencies: [293.66, 369.99, 440], color: "#a6e3a1" },
-  { name: "Chord E", type: "chord", frequencies: [329.63, 415.3, 493.88], color: "#a6e3a1" },
+const boards = [
+  {
+    name: "Starter",
+    sounds: [
+      { name: "Kick", type: "kick", color: "#f4c64d" },
+      { name: "Snare", type: "snare", color: "#ff6b6b" },
+      { name: "Hat", type: "hat", color: "#d8dee9" },
+      { name: "Clap", type: "clap", color: "#f58fb0" },
+      { name: "Tom", type: "tom", color: "#d08770" },
+      { name: "Bass A", type: "tone", frequency: 110, wave: "sawtooth", color: "#42d392" },
+      { name: "Bass C", type: "tone", frequency: 130.81, wave: "sawtooth", color: "#42d392" },
+      { name: "Bass E", type: "tone", frequency: 164.81, wave: "sawtooth", color: "#42d392" },
+      { name: "Bass G", type: "tone", frequency: 196, wave: "sawtooth", color: "#42d392" },
+      { name: "Bass B", type: "tone", frequency: 246.94, wave: "sawtooth", color: "#42d392" },
+      { name: "Bell A", type: "tone", frequency: 440, wave: "sine", color: "#8bd3ff" },
+      { name: "Bell C", type: "tone", frequency: 523.25, wave: "sine", color: "#8bd3ff" },
+      { name: "Bell E", type: "tone", frequency: 659.25, wave: "sine", color: "#8bd3ff" },
+      { name: "Bell G", type: "tone", frequency: 783.99, wave: "sine", color: "#8bd3ff" },
+      { name: "Bell B", type: "tone", frequency: 987.77, wave: "sine", color: "#8bd3ff" },
+      { name: "Zap", type: "zap", color: "#b48cff" },
+      { name: "Laser", type: "laser", color: "#b48cff" },
+      { name: "Rise", type: "rise", color: "#f38ba8" },
+      { name: "Drop", type: "drop", color: "#f38ba8" },
+      { name: "Blip", type: "tone", frequency: 880, wave: "square", color: "#f38ba8" },
+      { name: "Chord A", type: "chord", frequencies: [220, 277.18, 329.63], color: "#a6e3a1" },
+      { name: "Chord B", type: "chord", frequencies: [246.94, 311.13, 369.99], color: "#a6e3a1" },
+      { name: "Chord C", type: "chord", frequencies: [261.63, 329.63, 392], color: "#a6e3a1" },
+      { name: "Chord D", type: "chord", frequencies: [293.66, 369.99, 440], color: "#a6e3a1" },
+      { name: "Chord E", type: "chord", frequencies: [329.63, 415.3, 493.88], color: "#a6e3a1" },
+    ],
+  },
+  {
+    name: "FX",
+    sounds: [
+      { name: "Zap 1", type: "zap" },
+      { name: "Zap 2", type: "laser" },
+      { name: "Rise 1", type: "rise" },
+      { name: "Drop 1", type: "drop" },
+      { name: "Blip 1", type: "tone", frequency: 760, wave: "square" },
+      { name: "Ping", type: "tone", frequency: 1046.5, wave: "sine" },
+      { name: "Pong", type: "tone", frequency: 698.46, wave: "triangle" },
+      { name: "Alert", type: "tone", frequency: 1318.51, wave: "square" },
+      { name: "Boop", type: "tone", frequency: 329.63, wave: "sine" },
+      { name: "Pulse", type: "tone", frequency: 220, wave: "sawtooth" },
+      { name: "Sweep A", type: "rise" },
+      { name: "Sweep B", type: "drop" },
+      { name: "Click", type: "hat" },
+      { name: "Snap", type: "clap" },
+      { name: "Thud", type: "kick" },
+      { name: "Drone A", type: "tone", frequency: 82.41, wave: "sawtooth" },
+      { name: "Drone C", type: "tone", frequency: 130.81, wave: "sawtooth" },
+      { name: "Drone E", type: "tone", frequency: 164.81, wave: "triangle" },
+      { name: "Tone A", type: "tone", frequency: 440, wave: "triangle" },
+      { name: "Tone B", type: "tone", frequency: 493.88, wave: "triangle" },
+      { name: "Minor", type: "chord", frequencies: [220, 261.63, 329.63] },
+      { name: "Major", type: "chord", frequencies: [261.63, 329.63, 392] },
+      { name: "Wide", type: "chord", frequencies: [196, 293.66, 440] },
+      { name: "Bright", type: "chord", frequencies: [329.63, 415.3, 622.25] },
+      { name: "Soft", type: "chord", frequencies: [174.61, 220, 261.63] },
+    ],
+  },
 ];
 
 const board = document.querySelector("#soundboard");
 const stopAllButton = document.querySelector("#stopAll");
+const boardSwitch = document.querySelector("#boardSwitch");
+const boardName = document.querySelector("#boardName");
 const activeSources = new Set();
 const activeAudioElements = new Set();
 let audioContext;
+let currentBoardIndex = 0;
 
 const padColors = [
   "#f4c64d",
@@ -230,9 +268,12 @@ function playAudioFile(sound, pad) {
   });
 }
 
-function renderBoard() {
-  soundConfig.forEach((sound, index) => {
-    const padColor = padColors[index];
+function renderBoard(boardConfig) {
+  board.replaceChildren();
+  board.setAttribute("aria-label", `${boardConfig.name} soundboard pads`);
+
+  boardConfig.sounds.forEach((sound, index) => {
+    const padColor = padColors[index] || sound.color || "#8bd3ff";
     const pad = document.createElement("button");
     pad.type = "button";
     pad.className = "pad";
@@ -247,6 +288,15 @@ function renderBoard() {
   });
 }
 
+function switchBoard(boardIndex) {
+  currentBoardIndex = boardIndex;
+  const boardConfig = boards[currentBoardIndex];
+
+  stopAllSounds();
+  boardName.textContent = boardConfig.name;
+  renderBoard(boardConfig);
+}
+
 function colorToRgba(hexColor, alpha) {
   const normalizedHex = hexColor.replace("#", "");
   const red = parseInt(normalizedHex.slice(0, 2), 16);
@@ -256,7 +306,7 @@ function colorToRgba(hexColor, alpha) {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
-stopAllButton.addEventListener("click", () => {
+function stopAllSounds() {
   activeSources.forEach((source) => {
     try {
       source.stop();
@@ -272,6 +322,19 @@ stopAllButton.addEventListener("click", () => {
   document.querySelectorAll(".pad.is-playing").forEach((pad) => {
     pad.classList.remove("is-playing");
   });
+}
+
+boardSwitch.max = String(boards.length - 1);
+boardSwitch.value = String(currentBoardIndex);
+
+boardSwitch.addEventListener("input", () => {
+  const nextBoardIndex = Number(boardSwitch.value);
+
+  if (nextBoardIndex !== currentBoardIndex) {
+    switchBoard(nextBoardIndex);
+  }
 });
 
-renderBoard();
+stopAllButton.addEventListener("click", stopAllSounds);
+
+switchBoard(currentBoardIndex);

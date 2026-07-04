@@ -14,7 +14,22 @@
           <h1>Soundboard</h1>
           <p>25 quick pads with starter synth sounds.</p>
         </div>
-        <button class="stop-button" type="button" id="stopAll">Stop</button>
+        <div class="topbar-controls">
+          <label class="board-switcher" for="boardSwitch">
+            <span class="board-switcher-label">Board</span>
+            <input
+              type="range"
+              id="boardSwitch"
+              min="0"
+              max="0"
+              value="0"
+              step="1"
+              aria-label="Switch soundboard"
+            >
+            <span class="board-switcher-name" id="boardName">Starter</span>
+          </label>
+          <button class="stop-button" type="button" id="stopAll">Stop</button>
+        </div>
       </header>
 
       <section class="board" id="soundboard" aria-label="Soundboard pads"></section>
