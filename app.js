@@ -76,7 +76,7 @@ const closeBoardModalButton = document.querySelector("#closeBoardModal");
 const activeSources = new Set();
 const activeAudioElements = new Set();
 let audioContext;
-let currentBoardIndex = 0;
+let currentBoardIndex = getInitialBoardIndex();
 let boardDragStartX = 0;
 let boardDragPointerId = null;
 let lastFocusedElement;
@@ -332,11 +332,40 @@ function getSoundName(fileName) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function switchBoard(boardIndex) {
+function normalizeBoardName(boardTitle) {
+  return boardTitle.trim().toLocaleLowerCase();
+}
+
+function getInitialBoardIndex() {
+  const requestedBoardName = new URLSearchParams(window.location.search).get("board");
+
+  if (!requestedBoardName) {
+    return 0;
+  }
+
+  const requestedBoardKey = normalizeBoardName(requestedBoardName);
+  const matchedBoardIndex = boards.findIndex((boardConfig) => {
+    return normalizeBoardName(boardConfig.name) === requestedBoardKey;
+  });
+
+  return matchedBoardIndex === -1 ? 0 : matchedBoardIndex;
+}
+
+function syncBoardUrl(boardConfig) {
+  const url = new URL(window.location.href);
+
+  url.searchParams.set("board", boardConfig.name);
+  window.history.replaceState({}, "", url);
+}
+
+function switchBoard(boardIndex, shouldSyncUrl = true) {
   currentBoardIndex = boardIndex;
   const boardConfig = boards[currentBoardIndex];
 
   stopAllSounds();
+  if (shouldSyncUrl) {
+    syncBoardUrl(boardConfig);
+  }
   boardName.textContent = boardConfig.name;
   updateBoardSwitch();
   renderBoard(boardConfig);
@@ -497,4 +526,4 @@ document.addEventListener("keydown", (event) => {
 stopAllButton.addEventListener("click", stopAllSounds);
 
 updateBoardSwitch();
-switchBoard(currentBoardIndex);
+switchBoard(currentBoardIndex, false);
