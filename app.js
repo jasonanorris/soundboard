@@ -32,6 +32,34 @@ const activeSources = new Set();
 const activeAudioElements = new Set();
 let audioContext;
 
+const padColors = [
+  "#f4c64d",
+  "#ff7a66",
+  "#d8dee9",
+  "#f58fb0",
+  "#d08770",
+  "#42d392",
+  "#53c7a6",
+  "#68d86d",
+  "#93dc5c",
+  "#c4d957",
+  "#8bd3ff",
+  "#74b7ff",
+  "#8aa7ff",
+  "#a996ff",
+  "#c28dff",
+  "#b48cff",
+  "#9b95ff",
+  "#f38ba8",
+  "#ff8d8d",
+  "#ffad72",
+  "#a6e3a1",
+  "#7fdcb2",
+  "#69d0cf",
+  "#73c3ef",
+  "#98b6ff",
+];
+
 function getAudioContext() {
   const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
   audioContext ||= new AudioContextCtor();
@@ -204,17 +232,28 @@ function playAudioFile(sound, pad) {
 
 function renderBoard() {
   soundConfig.forEach((sound, index) => {
+    const padColor = padColors[index];
     const pad = document.createElement("button");
     pad.type = "button";
     pad.className = "pad";
-    pad.style.setProperty("--pad-color", sound.color);
+    pad.style.setProperty("--pad-color", padColor);
+    pad.style.setProperty("--pad-bg", colorToRgba(padColor, 0.18));
+    pad.style.setProperty("--pad-bg-strong", colorToRgba(padColor, 0.28));
     pad.innerHTML = `
-      <span class="pad-kicker">Pad ${String(index + 1).padStart(2, "0")}</span>
       <span class="pad-name">${sound.name}</span>
     `;
     pad.addEventListener("click", () => playSound(sound, pad));
     board.append(pad);
   });
+}
+
+function colorToRgba(hexColor, alpha) {
+  const normalizedHex = hexColor.replace("#", "");
+  const red = parseInt(normalizedHex.slice(0, 2), 16);
+  const green = parseInt(normalizedHex.slice(2, 4), 16);
+  const blue = parseInt(normalizedHex.slice(4, 6), 16);
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
 stopAllButton.addEventListener("click", () => {

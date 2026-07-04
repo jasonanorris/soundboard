@@ -88,15 +88,17 @@ p {
 .pad {
   position: relative;
   display: grid;
-  align-content: space-between;
+  place-items: center;
   min-height: 112px;
   aspect-ratio: 1 / 0.78;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: linear-gradient(145deg, var(--panel-strong), var(--panel));
+  background:
+    linear-gradient(145deg, var(--pad-bg-strong), transparent),
+    linear-gradient(145deg, var(--panel-strong), var(--panel));
   color: var(--text);
-  text-align: left;
+  text-align: center;
   cursor: pointer;
   overflow: hidden;
   transition:
@@ -124,21 +126,12 @@ p {
 
 .pad.is-playing {
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent),
+    linear-gradient(145deg, color-mix(in srgb, var(--pad-color), white 18%), transparent),
     linear-gradient(145deg, var(--panel-strong), var(--panel));
   border-color: var(--pad-color);
 }
 
-.pad-kicker {
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .pad-name {
-  margin-top: 10px;
   font-size: clamp(0.98rem, 2vw, 1.25rem);
   font-weight: 800;
   line-height: 1.05;
@@ -146,29 +139,63 @@ p {
 
 @media (max-width: 720px) {
   .app-shell {
-    width: min(100% - 20px, 520px);
-    padding: 20px 0;
+    width: calc(100% - 4px);
+    padding: 4px 0;
   }
 
+  .topbar {
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  h1 {
+    font-size: 1.35rem;
+  }
+
+  p {
+    display: none;
+  }
+
+  .stop-button {
+    min-width: 54px;
+    height: 28px;
+    border-radius: 5px;
+    font-size: 0.78rem;
+  }
+
+  .board {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2px;
+    padding: 2px;
+    border-radius: 5px;
+  }
+
+  .pad {
+    min-height: 50px;
+    aspect-ratio: 1 / 0.9;
+    padding: 4px 3px 7px;
+    border-radius: 5px;
+  }
+
+  .pad::after {
+    inset: auto 3px 3px 3px;
+    height: 2px;
+  }
+
+  .pad-name {
+    font-size: 0.8rem;
+    line-height: 1;
+  }
+}
+
+@media (max-width: 420px) {
   .topbar {
     align-items: start;
     flex-direction: column;
   }
 
-  .board {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-    padding: 10px;
-  }
-
-  .pad {
-    min-height: 96px;
-    padding: 12px;
-  }
-}
-
-@media (max-width: 420px) {
-  .board {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .stop-button {
+    width: 100%;
   }
 }
